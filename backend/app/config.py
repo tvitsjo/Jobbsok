@@ -7,6 +7,16 @@ _ENV_FILE = Path(__file__).resolve().parent.parent.parent / ".env"
 
 class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql+asyncpg://jobbsok:jobbsok@127.0.0.1:5432/jobbsok"
+
+    @property
+    def async_database_url(self) -> str:
+        """Convert any postgres:// URL to use asyncpg driver."""
+        url = self.DATABASE_URL
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return url
     SECRET_KEY: str = "change-me-to-a-random-secret-key"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
