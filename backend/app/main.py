@@ -2,18 +2,21 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import select
 
 from app.api import auth, profiles, preferences, jobs, notifications, admin
 from app.config import settings
+from app.database import Base, async_session, engine
+from app.models import *  # noqa: F401, F403
+from app.models.admin_config import AdminConfig
+from app.models.job_source import JobSource
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: seed default admin config and job sources
-    from app.database import async_session
-    from app.models.admin_config import AdminConfig
-    from app.models.job_source import JobSource
-    from sqlalchemy import select
+    # Create all tables on startup
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
     async with async_session() as db:
         # Seed default OpenRouter model

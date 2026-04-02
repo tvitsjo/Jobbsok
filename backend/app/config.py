@@ -1,8 +1,12 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings
+
+_ENV_FILE = Path(__file__).resolve().parent.parent.parent / ".env"
 
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql+asyncpg://jobbsok:jobbsok@db:5432/jobbsok"
+    DATABASE_URL: str = "postgresql+asyncpg://jobbsok:jobbsok@127.0.0.1:5432/jobbsok"
     SECRET_KEY: str = "change-me-to-a-random-secret-key"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
@@ -18,7 +22,7 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = "http://localhost:5173"
     UPLOAD_DIR: str = "/app/uploads"
 
-    model_config = {"env_file": ".env", "extra": "ignore"}
+    model_config = {"env_file": str(_ENV_FILE), "extra": "ignore"}
 
 
 settings = Settings()
